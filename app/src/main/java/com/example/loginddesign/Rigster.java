@@ -2,6 +2,13 @@ package com.example.loginddesign;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -15,48 +22,22 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
-
-public class MainActivity extends AppCompatActivity {
-@Override
+public class Rigster extends AppCompatActivity {
+    Routes routes=new Routes();
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Routes routes=new Routes();
-        SharedPreferences sharedPreferences=getSharedPreferences("Data",MODE_PRIVATE);
-        SharedPreferences.Editor editor=sharedPreferences.edit();
+        setContentView(R.layout.activity_rigster);
+        EditText Username=(EditText) findViewById(R.id.User);
         ProgressDialog progressDialog = new ProgressDialog(this);
-        Button loginButton = (Button) findViewById(R.id.RegButton);
-        // I know Its Error
-        @SuppressLint({"MissingInflatedId", "LocalSuppress"}) TextView textView=(TextView) findViewById(R.id.Reg);
-        textView.setOnClickListener(new View.OnClickListener() {
+        EditText Password=(EditText) findViewById(R.id.Pass);
+        Button RegButton=(Button) findViewById(R.id.RegButton);
+        RegButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(MainActivity.this,Rigster.class);
-                startActivity(i);
-            }
-        });
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                EditText FromEditText = (EditText) findViewById(R.id.User);
-                EditText passwordEditText = (EditText) findViewById(R.id.Pass);
-
-                String From = FromEditText.getText().toString().trim();
-                String password = passwordEditText.getText().toString().trim();
-//
-//                Intent i = new Intent(MainActivity.this,MainActivity2.class);
-//                startActivity(i);
+                // Why Its Named From Not Username??
+                String From = Username.getText().toString().trim();
+                String password = Password.getText().toString().trim();
                 if (From.isEmpty() && password.isEmpty()) {
                     // If either field is empty, show an error message
                     Toast.makeText(getApplicationContext(), "Please enter a From and password", Toast.LENGTH_SHORT).show();
@@ -67,47 +48,31 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
                 postDataUsingVolley(From,password);
-
-//                System.out.println("Hello World");
-
-
             }
             private void postDataUsingVolley(String From, String Password) {
 
                 progressDialog.setMessage("Waiting");
                 progressDialog.show();
-                RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
+                RequestQueue queue = Volley.newRequestQueue(Rigster.this);
 // on below line we are calling a string
                 // request method to post the data to our API
                 // in this we are calling a post method.
-                StringRequest request = new StringRequest(Request.Method.POST, routes.AUTH, new com.android.volley.Response.Listener<String>() {
+                StringRequest request = new StringRequest(Request.Method.POST, routes.USERROUTE, new com.android.volley.Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        // inside on response method we are
-                        // hiding our progress bar
-                    // Used SharedPref to Save my Token for the Next Requests
-// on below line we are displaying a success toast message.
-
                         try {
                             // on below line we are parsing the response
                             // to json object to extract data from it.
                             JSONObject respObj = new JSONObject(response);
-                            System.out.println(respObj.getBoolean("Status"));
                             if(respObj.getBoolean("Status")){
-                                editor.putString("Token",respObj.getString("accessToken"));
-                                editor.commit();
-                                Toast.makeText(MainActivity.this, "Welcome Back", Toast.LENGTH_SHORT).show();
-                                Intent i = new Intent(MainActivity.this,MainActivity2.class);
+                            Toast.makeText(Rigster.this, "Please Sign In", Toast.LENGTH_SHORT).show();
+                                Intent i = new Intent(Rigster.this,MainActivity.class);
                                 startActivity(i);
 
                             }else{
-                                progressDialog.dismiss();
-                                Toast.makeText(MainActivity.this, "Your Email Or Password Is wrong", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(Rigster.this, "Your Email Or Password Is wrong", Toast.LENGTH_SHORT).show();
                             }
-
 progressDialog.dismiss();
-
-
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -116,7 +81,7 @@ progressDialog.dismiss();
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         System.out.println("Error "+error);
-                        Toast.makeText(MainActivity.this, "Fail to get response " + error, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Rigster.this, "Fail to get response " + error, Toast.LENGTH_SHORT).show();
                     }
                 }) {
                     @Override
@@ -138,7 +103,7 @@ progressDialog.dismiss();
                 queue.add(request);
             }
         });
+
+
     }
-
-
 }
